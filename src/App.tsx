@@ -11,6 +11,9 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import AuthCallback from "./pages/AuthCallback";
 import RoleSelector from "./components/RoleSelector";
 import Settings from "./pages/Settings";
+import MyRoom from "./pages/MyRoom";
+import Store from "./pages/Store";
+import ClassManagement from "./pages/ClassManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -63,6 +66,30 @@ const App = () => (
                 <ProtectedRoute>
                   <Settings />
                 </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/room" 
+              element={
+                <StudentProtectedRoute>
+                  <MyRoom />
+                </StudentProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/store" 
+              element={
+                <StudentProtectedRoute>
+                  <Store />
+                </StudentProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/class/:classId" 
+              element={
+                <TeacherProtectedRoute>
+                  <ClassManagement />
+                </TeacherProtectedRoute>
               } 
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

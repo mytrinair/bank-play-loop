@@ -15,6 +15,7 @@ import classRoutes from './routes/classes';
 import storeRoutes from './routes/store';
 import cycleRoutes from './routes/cycles';
 import transactionRoutes from './routes/transactions';
+import geminiRoutes from './routes/gemini';
 import { initDatabase } from './db';
 
 // Initialize the in-memory database with sample data
@@ -41,8 +42,13 @@ app.use('*', cors({
 // Middleware: Format JSON responses nicely (development only)
 app.use('*', prettyJSON());
 
-// Middleware: Add Auth0 JWT validation to all API routes
-app.use('/api/*', authMiddleware);
+// Middleware: Add Auth0 JWT validation to all API routes except gemini (public helper)
+app.use('/api/*', async (c, next) => {
+  if (c.req.path.startsWith('/api/gemini')) {
+    return next();
+  }
+  return authMiddleware(c, next);
+});
 
 // Health check endpoint - useful for monitoring and testing
 app.get('/health', (c) => {
@@ -61,6 +67,7 @@ app.route('/api/classes', classRoutes);
 app.route('/api/store', storeRoutes);
 app.route('/api/cycles', cycleRoutes);
 app.route('/api/transactions', transactionRoutes);
+app.route('/api/gemini', geminiRoutes);
 
 // 404 handler for undefined routes
 app.notFound((c) => {

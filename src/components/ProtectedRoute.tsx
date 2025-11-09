@@ -97,7 +97,7 @@ export const ProtectedRoute = ({
             <p className="text-sm text-muted-foreground">
               Current role: {userRole || 'No role assigned'}
             </p>
-            <Button onClick={() => Navigate({ to: fallbackPath, replace: true })}>
+            <Button onClick={() => window.location.href = fallbackPath}>
               Go Home
             </Button>
           </div>

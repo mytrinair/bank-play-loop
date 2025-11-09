@@ -1,13 +1,26 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Coins, Target, ShoppingBag, BookOpen, Settings } from "lucide-react";
+import { Coins, Target, ShoppingBag, BookOpen, Settings, Home } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthenticatedFetch, createAuthenticatedAPI } from "@/lib/auth-api";
 import { useAuth } from "@/hooks/use-auth";
 import { formatDistanceToNow } from "date-fns";
 import { UserProfile } from "@/components/AuthComponents";
 import { useNavigate } from "react-router-dom";
+import { NavLink } from '../components/NavLink';
+import NeedsVsWantsQuest from "../components/quests/NeedsVsWantsQuest";
+import MiniLifeWeekQuest from "../components/quests/MiniLifeWeekQuest";
+import GardenTimeQuest from "../components/quests/GardenTimeQuest";
+import SnackStandQuest from "../components/quests/SnackStandQuest";
+import FirstGoalPosterQuest from "../components/quests/FirstGoalPosterQuest";
+import BirthdayMoneyQuest from "../components/quests/BirthdayMoneyQuest";
+import MiniWeekBudgetQuest from "../components/quests/MiniWeekBudgetQuest";
+import SurpriseExpenseQuest from "../components/quests/SurpriseExpenseQuest";
+import SmartShopperQuest from "../components/quests/SmartShopperQuest";
+import DojoUpgradeQuest from "../components/quests/DojoUpgradeQuest";
+import React from 'react';
 
 const StudentDashboard = () => {
   console.log('🎓 STUDENT DASHBOARD COMPONENT RENDERED');
@@ -15,9 +28,26 @@ const StudentDashboard = () => {
   const authFetch = useAuthenticatedFetch();
   const api = createAuthenticatedAPI(authFetch);
   const navigate = useNavigate();
-
+  
   // Use Auth0 user ID instead of hardcoded student ID
   const studentId = userInfo?.id || '';
+  
+  // Quest game state
+  const [showNeedsVsWantsQuest, setShowNeedsVsWantsQuest] = useState(false);
+  const [showMiniLifeWeekQuest, setShowMiniLifeWeekQuest] = useState(false);
+  const [showGardenTimeQuest, setShowGardenTimeQuest] = useState(false);
+  const [showSnackStandQuest, setShowSnackStandQuest] = useState(false);
+  const [showFirstGoalPosterQuest, setShowFirstGoalPosterQuest] = useState(false);
+  const [showBirthdayMoneyQuest, setShowBirthdayMoneyQuest] = useState(false);
+  const [showMiniWeekBudgetQuest, setShowMiniWeekBudgetQuest] = useState(false);
+  const [showSurpriseExpenseQuest, setShowSurpriseExpenseQuest] = useState(false);
+  const [showSmartShopperQuest, setShowSmartShopperQuest] = useState(false);
+  const [showDojoUpgradeQuest, setShowDojoUpgradeQuest] = useState(false);
+  const [currentCoins, setCurrentCoins] = useState(() => {
+    // Load coins from localStorage or default to 50
+    const savedCoins = localStorage.getItem(`student-${studentId}-coins`);
+    return savedCoins ? parseInt(savedCoins) : 50;
+  });
 
   const { data: studentData, isLoading: studentLoading } = useQuery({
     queryKey: ['student', studentId],
@@ -58,7 +88,7 @@ const StudentDashboard = () => {
     id: studentId,
     name: userInfo?.name || 'Student',
     avatarId: 'default',
-    coins: 50,
+    coins: currentCoins, // Use state-managed coins that persist in localStorage
     saveAmount: 30,
     spendAmount: 20,
     currentGoal: {
@@ -67,6 +97,47 @@ const StudentDashboard = () => {
       targetAmount: 100,
       currentAmount: 30
     }
+  };
+
+  // Handle quest completion
+  const handleQuestComplete = (reward: { coins: number; badge: string }, questId?: string) => {
+    // Update coins in state and localStorage
+    const newCoins = currentCoins + reward.coins;
+    setCurrentCoins(newCoins);
+    localStorage.setItem(`student-${studentId}-coins`, newCoins.toString());
+    
+    // Store badge in localStorage (simple array of earned badges)
+    const existingBadges = JSON.parse(localStorage.getItem(`student-${studentId}-badges`) || '[]');
+    if (!existingBadges.includes(reward.badge)) {
+      existingBadges.push(reward.badge);
+      localStorage.setItem(`student-${studentId}-badges`, JSON.stringify(existingBadges));
+    }
+    
+    // Store quest completion data for teacher dashboard
+    if (questId) {
+      const questCompletionData = {
+        completed: true,
+        completedAt: new Date().toISOString(),
+        coinsEarned: reward.coins,
+        badgeEarned: reward.badge
+      };
+      localStorage.setItem(`student-${studentId}-${questId}-completed`, JSON.stringify(questCompletionData));
+    }
+    
+    // Show success message
+    alert(`🎉 Quest Complete! You earned ${reward.coins} coins and the ${reward.badge} badge!`);
+    
+    // Close all quest modals
+    setShowNeedsVsWantsQuest(false);
+    setShowMiniLifeWeekQuest(false);
+    setShowGardenTimeQuest(false);
+    setShowSnackStandQuest(false);
+    setShowFirstGoalPosterQuest(false);
+    setShowBirthdayMoneyQuest(false);
+    setShowMiniWeekBudgetQuest(false);
+    setShowSurpriseExpenseQuest(false);
+    setShowSmartShopperQuest(false);
+    setShowDojoUpgradeQuest(false);
   };
 
   const quests = (questsData as any)?.quests || [
@@ -79,10 +150,66 @@ const StudentDashboard = () => {
     },
     {
       id: 'quest-2',
-      title: 'Budget Planning',
-      description: 'Create a budget for the school fair',
-      type: 'Budgeting',
+      title: 'Garden Time!',
+      description: 'You just earned 15 coins for helping clean the class garden. What do you want to do with the money?',
+      type: 'Saving vs Spending',
       rewardCoins: 15
+    },
+    {
+      id: 'quest-3',
+      title: 'The Snack Stand Dilemma',
+      description: 'After school, you want a snack. What snack should you get?',
+      type: 'Opportunity Cost',
+      rewardCoins: 15
+    },
+    {
+      id: 'quest-4',
+      title: 'My First Goal Poster',
+      description: 'Set the goal and decide how much to save per week.',
+      type: 'Goal Planning',
+      rewardCoins: 20
+    },
+    {
+      id: 'quest-5',
+      title: "It's Your Birthday",
+      description: 'You got 25 coins for your birthday. How are you going to spend your birthday money?',
+      type: 'Long-term vs Short-term',
+      rewardCoins: 25
+    },
+    {
+      id: 'quest-6',
+      title: 'The Mini-Week Budget',
+      description: 'You earn 20 coins each "week." Create your weekly plan.',
+      type: 'Budget Balancing',
+      rewardCoins: 25
+    },
+    {
+      id: 'quest-7',
+      title: 'The Surprise Expense',
+      description: "Your pet's toy broke — replacement costs 6 coins. How are you going to pay for the replacement?",
+      type: 'Unexpected Expenses',
+      rewardCoins: 20
+    },
+    {
+      id: 'quest-8',
+      title: 'The Smart Shopper Challenge',
+      description: 'Two backpacks are on sale, both are a different price and quality. Choose which to buy and explain why.',
+      type: 'Value Comparison',
+      rewardCoins: 25
+    },
+    {
+      id: 'quest-9',
+      title: 'My Dojo Upgrade Plan',
+      description: 'Design your dojo room. Each item has a price and make sure not to go over budget.',
+      type: 'Budget Constraints',
+      rewardCoins: 30
+    },
+    {
+      id: 'quest-10',
+      title: 'The Mini-Life Week',
+      description: 'Live a full week making money choices - earn, spend, save for 5 days!',
+      type: 'Life Simulation',
+      rewardCoins: 20
     }
   ];
   
@@ -128,7 +255,7 @@ const StudentDashboard = () => {
                 </h1>
                 <p className="text-sm text-deep-blue/70 font-medium">
                   {userInfo?.email && <span>{userInfo.email} • </span>}
-                  Grade 3 • Mrs. Johnson's Class
+                  Grade 3 • Mrs. Nair's Class
                 </p>
               </div>
             </div>
@@ -207,8 +334,20 @@ const StudentDashboard = () => {
               </div>
             </div>
             
-            <div className="pt-4 border-t-2 border-coral/30">
-              <Button className="w-full bg-gradient-to-r from-coral to-coral/80 hover:from-coral/90 hover:to-coral/70 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105" size="lg">
+            <div className="pt-4 border-t-2 border-coral/30 space-y-3">
+              <Button 
+                onClick={() => navigate('/room')}
+                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105" 
+                size="lg"
+              >
+                <Home className="h-5 w-5 mr-2" />
+                My Room
+              </Button>
+              <Button 
+                onClick={() => navigate('/store')}
+                className="w-full bg-gradient-to-r from-coral to-coral/80 hover:from-coral/90 hover:to-coral/70 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105" 
+                size="lg"
+              >
                 🛍️ Visit Store
               </Button>
             </div>
@@ -240,29 +379,65 @@ const StudentDashboard = () => {
                     border: 'border-deep-blue/20',
                     text: 'text-deep-blue',
                   },
-                  'Budgeting': {
+                  'Saving vs Spending': {
+                    bg: 'from-green-500/20 to-emerald-500/20',
+                    border: 'border-green-500/30',
+                    text: 'text-green-600',
+                  },
+                  'Opportunity Cost': {
+                    bg: 'from-orange-400/20 to-amber-400/20',
+                    border: 'border-orange-400/30',
+                    text: 'text-orange-600',
+                  },
+                  'Goal Planning': {
+                    bg: 'from-light-purple/20 to-deep-blue/20',
+                    border: 'border-light-purple/30',
+                    text: 'text-light-purple',
+                  },
+                  'Long-term vs Short-term': {
+                    bg: 'from-pink-400/20 to-rose-400/20',
+                    border: 'border-pink-400/30',
+                    text: 'text-pink-600',
+                  },
+                  'Budget Balancing': {
                     bg: 'from-success/20 to-success/10',
                     border: 'border-success/30',
                     text: 'text-success',
                   },
-                  'Comparison': {
-                    bg: 'from-playful-yellow/20 to-coral/20',
-                    border: 'border-playful-yellow/30',
-                    text: 'text-playful-yellow',
+                  'Unexpected Expenses': {
+                    bg: 'from-red-400/20 to-red-500/20',
+                    border: 'border-red-400/30',
+                    text: 'text-red-600',
                   },
-                  'Goal Setting': {
-                    bg: 'from-light-purple/20 to-deep-blue/20',
-                    border: 'border-light-purple/30',
-                    text: 'text-light-purple',
+                  'Value Comparison': {
+                    bg: 'from-blue-400/20 to-cyan-400/20',
+                    border: 'border-blue-400/30',
+                    text: 'text-blue-600',
+                  },
+                  'Budget Constraints': {
+                    bg: 'from-purple-400/20 to-indigo-400/20',
+                    border: 'border-purple-400/30',
+                    text: 'text-purple-600',
+                  },
+                  'Life Simulation': {
+                    bg: 'from-teal-400/20 to-emerald-400/20',
+                    border: 'border-teal-400/30',
+                    text: 'text-teal-600',
                   },
                 };
                 
                 const colors = typeColors[quest.type] || typeColors['Needs vs Wants'];
                 const typeEmojis: Record<string, string> = {
                   'Needs vs Wants': '🤔',
-                  'Budgeting': '💰',
-                  'Comparison': '🔍',
-                  'Goal Setting': '🎯',
+                  'Saving vs Spending': '🌱',
+                  'Opportunity Cost': '⚖️',
+                  'Goal Planning': '🎯',
+                  'Long-term vs Short-term': '⏰',
+                  'Budget Balancing': '💰',
+                  'Unexpected Expenses': '😱',
+                  'Value Comparison': '🔍',
+                  'Budget Constraints': '📐',
+                  'Life Simulation': '�',
                 };
                 
                 return (
@@ -285,8 +460,91 @@ const StudentDashboard = () => {
                         <Coins className="h-7 w-7 coin-shimmer drop-shadow-md" />
                         <span className="font-bold text-xl text-deep-blue">+{quest.rewardCoins} coins</span>
                       </div>
-                      <Button className="bg-gradient-to-r from-light-purple to-deep-blue text-white font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
-                        Start Quest →
+                      <Button 
+                        className="bg-gradient-to-r from-light-purple to-deep-blue text-white font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                        onClick={() => {
+                          // Map quest IDs and types to their respective quest components
+                          switch (quest.id) {
+                            case 'quest-1':
+                              setShowNeedsVsWantsQuest(true);
+                              break;
+                            case 'quest-2':
+                              setShowGardenTimeQuest(true);
+                              break;
+                            case 'quest-3':
+                              setShowSnackStandQuest(true);
+                              break;
+                            case 'quest-4':
+                              setShowFirstGoalPosterQuest(true);
+                              break;
+                            case 'quest-5':
+                              setShowBirthdayMoneyQuest(true);
+                              break;
+                            case 'quest-6':
+                              setShowMiniWeekBudgetQuest(true);
+                              break;
+                            case 'quest-7':
+                              setShowSurpriseExpenseQuest(true);
+                              break;
+                            case 'quest-8':
+                              setShowSmartShopperQuest(true);
+                              break;
+                            case 'quest-9':
+                              setShowDojoUpgradeQuest(true);
+                              break;
+                            case 'quest-10':
+                              setShowMiniLifeWeekQuest(true);
+                              break;
+                            default:
+                              // Fallback for type-based matching
+                              switch (quest.type) {
+                                case 'Needs vs Wants':
+                                  setShowNeedsVsWantsQuest(true);
+                                  break;
+                                case 'Saving vs Spending':
+                                  setShowGardenTimeQuest(true);
+                                  break;
+                                case 'Opportunity Cost':
+                                  setShowSnackStandQuest(true);
+                                  break;
+                                case 'Goal Planning':
+                                  setShowFirstGoalPosterQuest(true);
+                                  break;
+                                case 'Long-term vs Short-term':
+                                  setShowBirthdayMoneyQuest(true);
+                                  break;
+                                case 'Budget Balancing':
+                                  setShowMiniWeekBudgetQuest(true);
+                                  break;
+                                case 'Unexpected Expenses':
+                                  setShowSurpriseExpenseQuest(true);
+                                  break;
+                                case 'Value Comparison':
+                                  setShowSmartShopperQuest(true);
+                                  break;
+                                case 'Budget Constraints':
+                                  setShowDojoUpgradeQuest(true);
+                                  break;
+                                case 'Life Simulation':
+                                  setShowMiniLifeWeekQuest(true);
+                                  break;
+                                default:
+                                  alert('This quest is coming soon!');
+                              }
+                          }
+                        }}
+                      >
+                        {quest.type === 'Needs vs Wants' ? 'Play Game →' : 
+                         quest.type === 'Life Simulation' ? 'Start Week →' : 
+                         quest.type === 'Saving vs Spending' ? 'Make Choices →' :
+                         quest.type === 'Opportunity Cost' ? 'Choose Snack →' :
+                         quest.type === 'Goal Planning' ? 'Plan Goal →' :
+                         quest.type === 'Long-term vs Short-term' ? 'Spend Money →' :
+                         quest.type === 'Budget Balancing' ? 'Budget Week →' :
+                         quest.type === 'Unexpected Expenses' ? 'Handle Crisis →' :
+                         quest.type === 'Value Comparison' ? 'Go Shopping →' :
+                         quest.type === 'Budget Constraints' ? 'Upgrade Dojo →' :
+                         'Start Quest →'}
                       </Button>
                     </div>
                   </Card>
@@ -342,6 +600,117 @@ const StudentDashboard = () => {
           )}
         </Card>
       </div>
+
+      {/* Quest Modal Overlays */}
+      {showNeedsVsWantsQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <NeedsVsWantsQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-1')}
+              onClose={() => setShowNeedsVsWantsQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showGardenTimeQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <GardenTimeQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-2')}
+              onClose={() => setShowGardenTimeQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showSnackStandQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <SnackStandQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-3')}
+              onClose={() => setShowSnackStandQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showFirstGoalPosterQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <FirstGoalPosterQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-4')}
+              onClose={() => setShowFirstGoalPosterQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showBirthdayMoneyQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <BirthdayMoneyQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-5')}
+              onClose={() => setShowBirthdayMoneyQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showMiniWeekBudgetQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <MiniWeekBudgetQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-6')}
+              onClose={() => setShowMiniWeekBudgetQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showSurpriseExpenseQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <SurpriseExpenseQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-7')}
+              onClose={() => setShowSurpriseExpenseQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showSmartShopperQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <SmartShopperQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-8')}
+              onClose={() => setShowSmartShopperQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showDojoUpgradeQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <DojoUpgradeQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-9')}
+              onClose={() => setShowDojoUpgradeQuest(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showMiniLifeWeekQuest && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="max-w-5xl w-full max-h-[90vh] overflow-auto">
+            <MiniLifeWeekQuest 
+              onComplete={(reward) => handleQuestComplete(reward, 'quest-10')}
+              onClose={() => setShowMiniLifeWeekQuest(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Coins, GraduationCap, Users, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { AuthenticatedHeader, StudentLoginButton, TeacherLoginButton } from "@/components/AuthComponents";
+import { AuthenticatedHeader, LoginButton } from "@/components/AuthComponents";
 import { useAuth } from "@/hooks/use-auth";
 
 const Index = () => {
@@ -81,17 +81,10 @@ const Index = () => {
                 )}
               </>
             ) : (
-              <>
-                <StudentLoginButton 
-                  size="lg" 
-                  className="text-lg px-8 h-14 rounded-full" 
-                />
-                <TeacherLoginButton 
-                  size="lg" 
-                  variant="secondary" 
-                  className="text-lg px-8 h-14 rounded-full" 
-                />
-              </>
+              <LoginButton 
+                size="lg" 
+                className="text-lg px-8 h-14 rounded-full" 
+              />
             )}
           </div>
         </div>
@@ -217,7 +210,7 @@ const Index = () => {
                 Get Started
               </Button>
             ) : (
-              <TeacherLoginButton 
+              <LoginButton 
                 size="lg" 
                 className="text-lg px-8 h-14 rounded-full" 
               />

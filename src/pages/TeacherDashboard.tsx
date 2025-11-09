@@ -273,7 +273,13 @@ const TeacherDashboard = () => {
                           {classItem.grade} • Complexity: {classItem.complexity}
                         </p>
                       </div>
-                      <Button variant="outline" size="sm">Manage</Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => navigate(`/class/${classItem.id}`)}
+                      >
+                        Manage
+                      </Button>
                     </div>
 
                     <div className="space-y-3 pt-4 border-t">
