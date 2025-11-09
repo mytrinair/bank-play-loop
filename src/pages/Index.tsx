@@ -2,9 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Coins, GraduationCap, Users, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AuthenticatedHeader, StudentLoginButton, TeacherLoginButton } from "@/components/AuthComponents";
+import { useAuth } from "@/hooks/use-auth";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, isStudent, isTeacher } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-save-jar-light to-spend-jar-light">
@@ -17,14 +20,22 @@ const Index = () => {
             </div>
             <span className="text-2xl font-bold text-foreground">BankDojo Jr.</span>
           </div>
-          <nav className="flex gap-4">
-            <Button variant="ghost" onClick={() => navigate("/student")}>
-              Student Login
-            </Button>
-            <Button variant="default" onClick={() => navigate("/teacher")}>
-              Teacher Login
-            </Button>
-          </nav>
+          <AuthenticatedHeader>
+            {isAuthenticated && (
+              <div className="flex gap-2">
+                {(isStudent || !isTeacher) && (
+                  <Button variant="outline" onClick={() => navigate("/student")}>
+                    Student Dashboard
+                  </Button>
+                )}
+                {(isTeacher || !isStudent) && (
+                  <Button variant="outline" onClick={() => navigate("/teacher")}>
+                    Teacher Dashboard
+                  </Button>
+                )}
+              </div>
+            )}
+          </AuthenticatedHeader>
         </div>
       </header>
 
@@ -38,21 +49,41 @@ const Index = () => {
             A continuous, school-based financial life where children practice real money decisions weekly—with no finish line
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-            <Button 
-              size="lg" 
-              className="text-lg px-8 h-14 rounded-full"
-              onClick={() => navigate("/student")}
-            >
-              Start as Student
-            </Button>
-            <Button 
-              size="lg" 
-              variant="secondary"
-              className="text-lg px-8 h-14 rounded-full"
-              onClick={() => navigate("/teacher")}
-            >
-              Start as Teacher
-            </Button>
+            {isAuthenticated ? (
+              <>
+                {(isStudent || !isTeacher) && (
+                  <Button 
+                    size="lg" 
+                    className="text-lg px-8 h-14 rounded-full"
+                    onClick={() => navigate("/student")}
+                  >
+                    Go to Student Dashboard
+                  </Button>
+                )}
+                {(isTeacher || !isStudent) && (
+                  <Button 
+                    size="lg" 
+                    variant="secondary"
+                    className="text-lg px-8 h-14 rounded-full"
+                    onClick={() => navigate("/teacher")}
+                  >
+                    Go to Teacher Dashboard
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <StudentLoginButton 
+                  size="lg" 
+                  className="text-lg px-8 h-14 rounded-full" 
+                />
+                <TeacherLoginButton 
+                  size="lg" 
+                  variant="secondary" 
+                  className="text-lg px-8 h-14 rounded-full" 
+                />
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -168,13 +199,20 @@ const Index = () => {
             Join thousands of students learning financial literacy through practice, not just lessons.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="text-lg px-8 h-14 rounded-full"
-              onClick={() => navigate("/teacher")}
-            >
-              Get Started for Free
-            </Button>
+            {isAuthenticated ? (
+              <Button 
+                size="lg" 
+                className="text-lg px-8 h-14 rounded-full"
+                onClick={() => navigate(isTeacher ? "/teacher" : "/student")}
+              >
+                Get Started
+              </Button>
+            ) : (
+              <TeacherLoginButton 
+                size="lg" 
+                className="text-lg px-8 h-14 rounded-full" 
+              />
+            )}
           </div>
         </Card>
       </section>
