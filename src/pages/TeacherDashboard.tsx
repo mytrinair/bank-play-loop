@@ -6,20 +6,20 @@ import { Progress } from "@/components/ui/progress";
 
 const TeacherDashboard = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5">
+    <div className="min-h-screen bg-gradient-to-br from-light-purple/20 via-playful-yellow/10 to-coral/10">
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
+      <header className="border-b-4 border-deep-blue/20 bg-card/90 backdrop-blur-sm shadow-lg">
+        <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Teacher Dashboard</h1>
-              <p className="text-muted-foreground">Mrs. Johnson • Grade 3</p>
+              <h1 className="text-3xl font-bold text-deep-blue">Teacher Dashboard</h1>
+              <p className="text-deep-blue/70 font-medium text-lg">Mrs. Johnson • Grade 3</p>
             </div>
-            <div className="flex gap-3">
-              <Button variant="outline" size="icon">
-                <Settings className="h-5 w-5" />
+            <div className="flex gap-4">
+              <Button variant="outline" size="icon" className="border-2 border-deep-blue/30 hover:border-deep-blue hover:bg-light-purple/20 rounded-2xl">
+                <Settings className="h-6 w-6 text-deep-blue" />
               </Button>
-              <Button>
+              <Button className="bg-gradient-to-r from-deep-blue to-light-purple text-white font-bold shadow-lg hover:shadow-xl transition-all rounded-2xl">
                 <Plus className="h-5 w-5 mr-2" />
                 New Class
               </Button>
@@ -31,57 +31,57 @@ const TeacherDashboard = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Stats Overview */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="p-6 space-y-3">
+          <Card className="p-6 space-y-4 border-4 border-light-purple/40 bg-gradient-to-br from-card to-light-purple/10 shadow-lg hover:shadow-xl transition-all">
             <div className="flex items-center justify-between">
-              <Users className="h-8 w-8 text-primary" />
-              <span className="text-3xl font-bold text-foreground">24</span>
+              <Users className="h-10 w-10 text-deep-blue" />
+              <span className="text-4xl font-bold text-deep-blue">24</span>
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">Active Students</p>
-              <p className="text-xs text-muted-foreground">In all classes</p>
+              <p className="text-base font-bold text-deep-blue">Active Students</p>
+              <p className="text-sm text-deep-blue/70 font-medium">In all classes</p>
             </div>
           </Card>
 
-          <Card className="p-6 space-y-3">
+          <Card className="p-6 space-y-4 border-4 border-success/40 bg-gradient-to-br from-card to-success/10 shadow-lg hover:shadow-xl transition-all">
             <div className="flex items-center justify-between">
-              <CheckCircle className="h-8 w-8 text-success" />
-              <span className="text-3xl font-bold text-foreground">89</span>
+              <CheckCircle className="h-10 w-10 text-success" />
+              <span className="text-4xl font-bold text-success">89</span>
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">Quests Completed</p>
-              <p className="text-xs text-muted-foreground">This week</p>
+              <p className="text-base font-bold text-deep-blue">Quests Completed</p>
+              <p className="text-sm text-deep-blue/70 font-medium">This week</p>
             </div>
           </Card>
 
-          <Card className="p-6 space-y-3">
+          <Card className="p-6 space-y-4 border-4 border-playful-yellow/40 bg-gradient-to-br from-card to-playful-yellow/10 shadow-lg hover:shadow-xl transition-all">
             <div className="flex items-center justify-between">
-              <Clock className="h-8 w-8 text-warning" />
-              <span className="text-3xl font-bold text-foreground">12</span>
+              <Clock className="h-10 w-10 text-playful-yellow" />
+              <span className="text-4xl font-bold text-playful-yellow">12</span>
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">Pending Reviews</p>
-              <p className="text-xs text-muted-foreground">Need approval</p>
+              <p className="text-base font-bold text-deep-blue">Pending Reviews</p>
+              <p className="text-sm text-deep-blue/70 font-medium">Need approval</p>
             </div>
           </Card>
 
-          <Card className="p-6 space-y-3">
+          <Card className="p-6 space-y-4 border-4 border-coral/40 bg-gradient-to-br from-card to-coral/10 shadow-lg hover:shadow-xl transition-all">
             <div className="flex items-center justify-between">
-              <TrendingUp className="h-8 w-8 text-info" />
-              <span className="text-3xl font-bold text-foreground">76%</span>
+              <TrendingUp className="h-10 w-10 text-coral" />
+              <span className="text-4xl font-bold text-coral">76%</span>
             </div>
             <div>
-              <p className="text-sm font-medium text-foreground">Avg. Completion</p>
-              <p className="text-xs text-muted-foreground">Across all quests</p>
+              <p className="text-base font-bold text-deep-blue">Avg. Completion</p>
+              <p className="text-sm text-deep-blue/70 font-medium">Across all quests</p>
             </div>
           </Card>
         </div>
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="classes" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="classes">Classes</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="progress">Progress</TabsTrigger>
+          <TabsList className="grid w-full max-w-md grid-cols-3 h-14 bg-gradient-to-r from-light-purple/20 to-playful-yellow/20 border-3 border-deep-blue/20">
+            <TabsTrigger value="classes" className="text-base font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-deep-blue data-[state=active]:to-light-purple data-[state=active]:text-white rounded-xl">Classes</TabsTrigger>
+            <TabsTrigger value="pending" className="text-base font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-playful-yellow data-[state=active]:to-coral data-[state=active]:text-white rounded-xl">Pending</TabsTrigger>
+            <TabsTrigger value="progress" className="text-base font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-success data-[state=active]:to-success/80 data-[state=active]:text-white rounded-xl">Progress</TabsTrigger>
           </TabsList>
 
           {/* Classes Tab */}

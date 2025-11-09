@@ -66,6 +66,10 @@ export default {
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
         info: "hsl(var(--info))",
+        "light-purple": "hsl(var(--light-purple))",
+        "deep-blue": "hsl(var(--deep-blue))",
+        "playful-yellow": "hsl(var(--playful-yellow))",
+        coral: "hsl(var(--coral))",
       },
       borderRadius: {
         lg: "var(--radius)",
