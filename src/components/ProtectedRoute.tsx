@@ -79,6 +79,12 @@ export const ProtectedRoute = ({
 
   // Check role-based access if a specific role is required
   if (requiredRole && userRole !== requiredRole) {
+    console.log('ProtectedRoute - Access denied:', {
+      requiredRole,
+      userRole,
+      currentPath: location.pathname,
+      mismatch: true
+    });
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-save-jar-light to-spend-jar-light">
         <Card className="p-8 space-y-4 text-center max-w-md">
@@ -101,6 +107,12 @@ export const ProtectedRoute = ({
   }
 
   // All checks passed - render the protected content
+  console.log('ProtectedRoute - Access granted:', {
+    requiredRole,
+    userRole,
+    currentPath: location.pathname,
+    authenticated: isAuthenticated
+  });
   return <>{children}</>;
 };
 

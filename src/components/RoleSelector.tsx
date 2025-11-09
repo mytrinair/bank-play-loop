@@ -22,15 +22,37 @@ const RoleSelector = () => {
       
       console.log('Role set, localStorage now has:', localStorage.getItem('userRole'));
       
+      // Double check that the role was actually set correctly
+      const verifyRole = localStorage.getItem('userRole');
+      console.log('Verification - role in localStorage:', verifyRole);
+      
+      if (verifyRole !== role) {
+        console.error('ROLE MISMATCH! Expected:', role, 'Got:', verifyRole);
+      }
+      
       toast.success(`Welcome, ${role}! Setting up your dashboard...`);
       
       // Wait a bit for the role to be properly set in the auth context
       await new Promise(resolve => setTimeout(resolve, 200));
       
       const targetPath = role === 'teacher' ? '/teacher' : '/student';
-      console.log('Navigating to:', targetPath);
+      console.log('Navigation logic:', {
+        originalRole: role,
+        isTeacher: role === 'teacher',
+        targetPath: targetPath,
+        currentPath: window.location.pathname
+      });
       
+      // Try both navigation methods for debugging
       navigate(targetPath, { replace: true });
+      
+      // If React Router navigation fails, try window.location as fallback
+      setTimeout(() => {
+        if (window.location.pathname === '/setup') {
+          console.log('React Router navigation may have failed, trying window.location');
+          window.location.href = targetPath;
+        }
+      }, 500);
       
     } catch (error) {
       console.error('Failed to assign role:', error);

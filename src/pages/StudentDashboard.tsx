@@ -10,6 +10,7 @@ import { UserProfile } from "@/components/AuthComponents";
 import { useNavigate } from "react-router-dom";
 
 const StudentDashboard = () => {
+  console.log('🎓 STUDENT DASHBOARD COMPONENT RENDERED');
   const { userInfo, isAuthenticated } = useAuth();
   const authFetch = useAuthenticatedFetch();
   const api = createAuthenticatedAPI(authFetch);

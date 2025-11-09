@@ -12,6 +12,7 @@ import { UserProfile } from "@/components/AuthComponents";
 import { useNavigate } from "react-router-dom";
 
 const TeacherDashboard = () => {
+  console.log('👩‍🏫 TEACHER DASHBOARD COMPONENT RENDERED');
   const { userInfo, isAuthenticated } = useAuth();
   const authFetch = useAuthenticatedFetch();
   const api = createAuthenticatedAPI(authFetch);

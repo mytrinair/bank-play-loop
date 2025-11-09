@@ -31,31 +31,40 @@ export const useAuth = () => {
   const userRole = useMemo(() => {
     if (!auth0.user) return null;
     
-    // First check localStorage (for immediate role assignment)
-    const storedRole = localStorage.getItem('userRole');
-    console.log('useAuth - stored role in localStorage:', storedRole);
-    if (storedRole && ['student', 'teacher'].includes(storedRole)) {
-      console.log('useAuth - returning stored role:', storedRole);
-      return storedRole as 'student' | 'teacher';
-    }
-    
-    // Check app_metadata for role (set by Auth0 rules/actions)
+    // Check app_metadata for role (the authoritative source)
     const appMetadata = (auth0.user as any)['https://bankdojo.app/app_metadata'];
+    const userMetadata = (auth0.user as any)['https://bankdojo.app/user_metadata'];
+    
+    console.log('useAuth - checking roles:', {
+      userEmail: auth0.user.email,
+      appMetadataRole: appMetadata?.role,
+      userMetadataRole: userMetadata?.role
+    });
+    
+    // Prioritize Auth0 metadata over localStorage
     if (appMetadata?.role) {
-      // Store in localStorage for faster access
+      console.log('useAuth - found role in app_metadata:', appMetadata.role);
       localStorage.setItem('userRole', appMetadata.role);
       return appMetadata.role;
     }
     
-    // Fallback: check user_metadata
-    const userMetadata = (auth0.user as any)['https://bankdojo.app/user_metadata'];
     if (userMetadata?.role) {
+      console.log('useAuth - found role in user_metadata:', userMetadata.role);
       localStorage.setItem('userRole', userMetadata.role);
       return userMetadata.role;
     }
     
+    // Only use localStorage if Auth0 metadata is not available (for immediate access after role selection)
+    const storedRole = localStorage.getItem('userRole');
+    console.log('useAuth - checking localStorage role:', storedRole);
+    
+    if (storedRole && ['student', 'teacher'].includes(storedRole)) {
+      console.log('useAuth - using stored role:', storedRole);
+      return storedRole as 'student' | 'teacher';
+    }
+    
     // No role assigned yet - user needs to select role
-    console.log('useAuth - no role found, returning null');
+    console.log('useAuth - no role found anywhere, returning null');
     return null;
   }, [auth0.user, roleRefresh]);
 
@@ -68,7 +77,13 @@ export const useAuth = () => {
   // Check if user needs to select a role
   const needsRoleSelection = useMemo(() => {
     const needs = auth0.isAuthenticated && auth0.user && userRole === null;
-    console.log('needsRoleSelection:', { isAuthenticated: auth0.isAuthenticated, hasUser: !!auth0.user, userRole, needs });
+    console.log('needsRoleSelection check:', { 
+      isAuthenticated: auth0.isAuthenticated, 
+      hasUser: !!auth0.user, 
+      userRole, 
+      needs,
+      currentPath: window.location.pathname 
+    });
     return needs;
   }, [auth0.isAuthenticated, auth0.user, userRole]);
 

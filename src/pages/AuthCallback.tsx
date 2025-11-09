@@ -8,24 +8,52 @@ const AuthCallback = () => {
   const { isLoading, error, isAuthenticated, user } = useAuth0();
   const navigate = useNavigate();
 
+  // Clear localStorage on fresh auth callback to ensure clean state
+  useEffect(() => {
+    if (window.location.search.includes('code=')) {
+      // This is a fresh auth callback from Auth0
+      console.log('Fresh auth callback detected, clearing localStorage');
+      localStorage.removeItem('userRole');
+    }
+  }, []);
+
   useEffect(() => {
     if (!isLoading && isAuthenticated && user) {
-      // Check if user has a role assigned
+      console.log('AuthCallback - Processing login for user:', user.email);
+      
+      // Check if user has a role assigned in Auth0 metadata (the authoritative source)
       const appMetadata = (user as any)['https://bankdojo.app/app_metadata'];
       const userMetadata = (user as any)['https://bankdojo.app/user_metadata'];
-      const storedRole = localStorage.getItem('userRole');
       
-      let userRole = storedRole || appMetadata?.role || userMetadata?.role;
+      // Only trust Auth0 metadata for role assignment, not localStorage for new logins
+      let userRole = appMetadata?.role || userMetadata?.role;
+      
+      console.log('AuthCallback - role detection:', {
+        userEmail: user.email,
+        appMetadataRole: appMetadata?.role,
+        userMetadataRole: userMetadata?.role,
+        finalRole: userRole,
+        currentPath: window.location.pathname,
+        willRequireRoleSelection: !userRole
+      });
       
       if (!userRole) {
-        // No role assigned - redirect to role selection
+        // No role in Auth0 metadata - user needs to select role
+        console.log('AuthCallback - No role found, redirecting to role selection');
+        
+        // Clear any stale localStorage role data
+        localStorage.removeItem('userRole');
+        
         setTimeout(() => {
           navigate('/setup', { replace: true });
         }, 100);
         return;
       }
 
-      // User has a role - redirect to appropriate dashboard
+      // User has a role in Auth0 - store it locally and redirect to appropriate dashboard
+      console.log('AuthCallback - User has role:', userRole, 'storing and redirecting');
+      localStorage.setItem('userRole', userRole);
+      
       const targetUrl = userRole === 'teacher' ? '/teacher' : '/student';
       
       setTimeout(() => {

@@ -9,6 +9,15 @@ const Index = () => {
   const navigate = useNavigate();
   const { isAuthenticated, isStudent, isTeacher } = useAuth();
 
+  // Debug function - can be called from browser console
+  if (typeof window !== 'undefined') {
+    (window as any).clearBankDojoData = () => {
+      localStorage.clear();
+      sessionStorage.clear();
+      console.log('All BankDojo data cleared! Refresh the page to start fresh.');
+    };
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-save-jar-light to-spend-jar-light">
       {/* Header */}
